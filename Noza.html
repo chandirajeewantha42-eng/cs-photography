@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Noza</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-dark: #0a0c10;
+            --card-bg: rgba(22, 27, 34, 0.7);
+            --accent-glow: linear-gradient(135deg, #7c3aed 0%, #2563eb 50%, #06b6d4 100%);
+            --accent-purple: #8b5cf6;
+            --accent-cyan: #06b6d4;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --border-color: rgba(124, 58, 237, 0.25);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* --- HOME VIEW --- */
+        #home-view {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        .ambient-orb {
+            position: absolute;
+            width: 480px;
+            height: 480px;
+            background: radial-gradient(circle, rgba(124, 58, 237, 0.22) 0%, transparent 70%);
+            filter: blur(90px);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .brand-logo {
+            font-size: 72px;
+            font-weight: 800;
+            letter-spacing: -2px;
+            background: var(--accent-glow);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+            z-index: 1;
+        }
+
+        .brand-tagline {
+            color: var(--text-muted);
+            font-size: 15px;
+            margin-bottom: 35px;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .brand-tagline .ai-badge {
+            background: rgba(124, 58, 237, 0.2);
+            border: 1px solid var(--accent-purple);
+            color: #a78bfa;
+            font-size: 11px;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-weight: 700;
+        }
+
+        .search-box-container {
+            width: 100%;
+            max-width: 680px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .search-bar {
+            width: 100%;
+            padding: 18px 110px 18px 24px;
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 50px;
+            color: #fff;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .search-bar:focus {
+            border-color: var(--accent-purple);
+            box-shadow: 0 0 25px rgba(124, 58, 237, 0.4);
+        }
+
+        .search-actions {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .voice-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.2s ease;
+        }
+
+        .voice-btn:hover, .voice-btn.listening {
+            color: var(--accent-cyan);
+            background: rgba(6, 182, 212, 0.15);
+        }
+
+        .search-btn {
+            background: var(--accent-glow);
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            color: #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: transform 0.2s ease;
+        }
+
+        .search-btn:hover {
+            transform: scale(1.08);
+        }
+
+        /* TRENDING SEARCHES */
+        .trending-container {
+            margin-top: 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            z-index: 1;
+            max-width: 700px;
+        }
+
+        .trending-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .chip {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-main);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .chip:hover {
+            background: rgba(124, 58, 237, 0.2);
+            border-color: var(--accent-purple);
+            color: #fff;
+        }
+
+        /* --- RESULTS VIEW --- */
+        #results-view {
+            display: none;
+            flex: 1;
+            flex-direction: column;
+        }
+
+        header {
+            padding: 20px 6% 0 6%;
+            background: rgba(10, 12, 16, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            margin-bottom: 15px;
+        }
+
+        .small-logo {
+            font-size: 28px;
+            font-weight: 800;
+            background: var(--accent-glow);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        /* TABS STYLING */
+        .search-tabs {
+            display: flex;
+            gap: 25px;
+            margin-left: 120px;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 14px;
+            font-weight: 600;
+            padding: 10px 0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        .tab-btn:hover, .tab-btn.active {
+            color: var(--accent-cyan);
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--accent-glow);
+            border-radius: 3px 3px 0 0;
+        }
+
+        .results-wrapper {
+            display: flex;
+            gap: 30px;
+            max-width: 1200px;
+            margin: 30px 6%;
+            flex: 1;
+        }
+
+        .main-results {
+            flex: 1;
+        }
+
+        .sidebar-results {
+            width: 320px;
+        }
+
+        .stats-text {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+
+        /* AI Overview Card & Chat Follow-up */
+        .ai-overview-card {
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.15) 0%, rgba(6, 182, 212, 0.1) 100%);
+            border: 1px solid var(--accent-purple);
+            border-radius: 18px;
+            padding: 24px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 32px rgba(124, 58, 237, 0.15);
+        }
+
+        .ai-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 14px;
+            font-weight: 700;
+            color: #a78bfa;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+
+        .ai-card-body {
+            font-size: 15px;
+            color: #e2e8f0;
+            line-height: 1.6;
+        }
+
+        .ai-image {
+            float: right;
+            max-width: 130px;
+            max-height: 130px;
+            border-radius: 12px;
+            margin-left: 15px;
+            margin-bottom: 10px;
+            object-fit: cover;
+        }
+
+        .ai-chat-input-box {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 30px;
+            padding: 6px 16px;
+        }
+
+        .ai-chat-input-box input {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #fff;
+            width: 100%;
+            font-size: 13px;
+        }
+
+        .ai-chat-input-box button {
+            background: var(--accent-purple);
+            border: none;
+            color: #fff;
+            padding: 6px 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* Standard Cards */
+        .result-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 22px;
+            margin-bottom: 18px;
+            transition: transform 0.2s ease;
+            position: relative;
+        }
+
+        .result-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--accent-purple);
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .result-url {
+            font-size: 13px;
+            color: var(--accent-cyan);
+            margin-bottom: 6px;
+            display: block;
+            word-break: break-all;
+        }
+
+        .result-title {
+            font-size: 19px;
+            font-weight: 700;
+            color: #fff;
+            text-decoration: none;
+            margin-bottom: 8px;
+            display: inline-block;
+        }
+
+        .result-snippet {
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .result-card-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .action-link {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: color 0.2s;
+        }
+
+        .action-link:hover { color: var(--accent-cyan); }
+
+        /* SIDEBAR CARD */
+        .sidebar-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .sidebar-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .related-item {
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 13px;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .related-item:hover { color: var(--accent-purple); }
+
+        /* GRID FOR IMAGE RESULTS */
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .image-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .image-card:hover { transform: scale(1.04); border-color: var(--accent-cyan); }
+        .image-card img { width: 100%; height: 160px; object-fit: cover; display: block; }
+
+        .image-card-caption {
+            padding: 10px;
+            font-size: 12px;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* VIDEO RESULTS */
+        .video-card {
+            display: flex;
+            gap: 20px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 18px;
+            margin-bottom: 18px;
+        }
+
+        .video-thumb {
+            position: relative;
+            min-width: 200px;
+            height: 120px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .video-thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+        .play-btn {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Loading Spinner */
+        .ai-loading {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--accent-purple);
+            font-size: 15px;
+            padding: 30px 0;
+        }
+
+        .spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(124, 58, 237, 0.2);
+            border-top: 3px solid var(--accent-purple);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        footer {
+            padding: 20px 6%;
+            background: rgba(10, 12, 16, 0.95);
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        @media (max-width: 900px) {
+            .results-wrapper { flex-direction: column; }
+            .sidebar-results { width: 100%; }
+        }
+
+        @media (max-width: 768px) {
+            .header-top { flex-direction: column; align-items: flex-start; gap: 15px; }
+            .search-tabs { margin-left: 0; }
+            .video-card { flex-direction: column; }
+            .video-thumb { min-width: 100%; height: 180px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HOMEPAGE VIEW -->
+    <div id="home-view">
+        <div class="ambient-orb"></div>
+        <h1 class="brand-logo">NOZA</h1>
+        <p class="brand-tagline">
+            Search anything with <span class="ai-badge"><i class="fa-solid fa-wand-magic-sparkles"></i> AI Engine v2.0</span>
+        </p>
+        
+        <div class="search-box-container">
+            <input type="text" id="home-search-input" class="search-bar" placeholder="Search web, images, videos, topics..." onkeyup="handleKeyPress(event, 'home')">
+            <div class="search-actions">
+                <button class="voice-btn" title="Voice Search" onclick="startVoiceSearch('home')"><i class="fa-solid fa-microphone"></i></button>
+                <button class="search-btn" onclick="triggerSearch('home')"><i class="fa-solid fa-magnifying-glass"></i></button>
+            </div>
+        </div>
+
+        <!-- TRENDING SEARCH CHIPS -->
+        <div class="trending-container">
+            <span class="trending-label"><i class="fa-solid fa-fire"></i> Trending:</span>
+            <span class="chip" onclick="quickSearch('Electric Cars')">Electric Cars</span>
+            <span class="chip" onclick="quickSearch('AI Marketing Tools')">AI Marketing Tools</span>
+            <span class="chip" onclick="quickSearch('Space Exploration')">Space Exploration</span>
+            <span class="chip" onclick="quickSearch('Quantum Computing')">Quantum Computing</span>
+        </div>
+    </div>
+
+    <!-- RESULTS VIEW -->
+    <div id="results-view">
+        <header>
+            <div class="header-top">
+                <a class="small-logo" onclick="showHome()">NOZA</a>
+                <div class="search-box-container" style="max-width: 550px;">
+                    <input type="text" id="results-search-input" class="search-bar" style="padding: 12px 90px 12px 20px; font-size: 14px;" onkeyup="handleKeyPress(event, 'results')">
+                    <div class="search-actions" style="right: 6px;">
+                        <button class="voice-btn" style="width: 32px; height: 32px; font-size: 14px;" onclick="startVoiceSearch('results')"><i class="fa-solid fa-microphone"></i></button>
+                        <button class="search-btn" style="width: 36px; height: 36px; font-size: 13px;" onclick="triggerSearch('results')"><i class="fa-solid fa-magnifying-glass"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SEARCH TABS -->
+            <div class="search-tabs">
+                <button class="tab-btn active" onclick="switchTab('all')"><i class="fa-solid fa-globe"></i> All</button>
+                <button class="tab-btn" onclick="switchTab('images')"><i class="fa-solid fa-image"></i> Images</button>
+                <button class="tab-btn" onclick="switchTab('videos')"><i class="fa-solid fa-video"></i> Videos</button>
+                <button class="tab-btn" onclick="switchTab('news')"><i class="fa-solid fa-newspaper"></i> News</button>
+            </div>
+        </header>
+
+        <div class="results-wrapper">
+            <div class="main-results">
+                <div id="stats" class="stats-text"></div>
+                <!-- AI Summary -->
+                <div id="ai-overview-container"></div>
+                <!-- Main Search Results -->
+                <div id="results-list"></div>
+            </div>
+
+            <!-- SIDEBAR RESULTS -->
+            <div class="sidebar-results" id="sidebar-container">
+                <div class="sidebar-card">
+                    <div class="sidebar-title"><i class="fa-solid fa-circle-question" style="color: var(--accent-purple);"></i> People Also Ask</div>
+                    <div id="related-questions"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+       <p>&copy; 2026 Noza Search Technologies. AI Powered & Engineered for speed.</p>
+		<p>Jeewantha Creations.<p>
+    </footer>
+
+    <script>
+        let currentTab = 'all';
+        let activeQuery = '';
+
+        const localDatabase = [
+            {
+                id: 1,
+                title: "Vividsphere Advertising | Premier Marketing Agency",
+                url: "https://vividsphere.com",
+                snippet: "Vividsphere Advertising delivers high-converting social media marketing, printable contents, and creative visual design services."
+            },
+            {
+                id: 2,
+                title: "Ten4teen Restaurant | Fine Dining & Coastal Cuisine",
+                url: "https://ten4teen-restaurant.com",
+                snippet: "Located in Unawatuna, Ten4teen offers authentic Sri Lankan seafood, tropical cocktails, and global culinary dishes."
+            }
+        ];
+
+        function handleKeyPress(event, source) {
+            if (event.key === 'Enter') triggerSearch(source);
+        }
+
+        function quickSearch(queryText) {
+            document.getElementById('home-search-input').value = queryText;
+            triggerSearch('home');
+        }
+
+        function triggerSearch(source) {
+            const inputId = source === 'home' ? 'home-search-input' : 'results-search-input';
+            const query = document.getElementById(inputId).value.trim();
+
+            if (!query) return;
+
+            activeQuery = query;
+            document.getElementById('results-search-input').value = query;
+            document.getElementById('home-view').style.display = 'none';
+            document.getElementById('results-view').style.display = 'flex';
+
+            executeTabSearch();
+        }
+
+        function switchTab(tabName) {
+            currentTab = tabName;
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            
+            if (activeQuery) executeTabSearch();
+        }
+
+        function showHome() {
+            document.getElementById('results-view').style.display = 'none';
+            document.getElementById('home-view').style.display = 'flex';
+            document.getElementById('home-search-input').value = '';
+        }
+
+        // Voice Search Integration
+        function startVoiceSearch(source) {
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                alert("Voice search is not supported in your browser.");
+                return;
+            }
+
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'en-US';
+
+            const inputId = source === 'home' ? 'home-search-input' : 'results-search-input';
+            const inputElem = document.getElementById(inputId);
+
+            recognition.onstart = function() {
+                inputElem.placeholder = "Listening...";
+            };
+
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript;
+                inputElem.value = transcript;
+                triggerSearch(source);
+            };
+
+            recognition.start();
+        }
+
+        function executeTabSearch() {
+            document.getElementById('sidebar-container').style.display = (currentTab === 'all') ? 'block' : 'none';
+
+            if (currentTab === 'all') executeAllSearch(activeQuery);
+            else if (currentTab === 'images') executeImagesSearch(activeQuery);
+            else if (currentTab === 'videos') executeVideosSearch(activeQuery);
+            else if (currentTab === 'news') executeNewsSearch(activeQuery);
+        }
+
+        // 1. ALL SEARCH WITH AI & SIDEBAR
+        async function executeAllSearch(query) {
+            const startTime = performance.now();
+            const terms = query.toLowerCase().split(' ').filter(term => term.length > 0);
+
+            const aiContainer = document.getElementById('ai-overview-container');
+            const listContainer = document.getElementById('results-list');
+            const stats = document.getElementById('stats');
+
+            aiContainer.innerHTML = `
+                <div class="ai-loading">
+                    <div class="spinner"></div>
+                    <span>NOZA AI is analyzing overview for "${escapeHtml(query)}"...</span>
+                </div>
+            `;
+            listContainer.innerHTML = '';
+            stats.innerHTML = `Searching web for "<strong>${escapeHtml(query)}</strong>"...`;
+
+            renderRelatedQuestions(query);
+
+            let localResults = [];
+            localDatabase.forEach(item => {
+                let score = 0;
+                terms.forEach(term => {
+                    if (item.title.toLowerCase().includes(term)) score += 5;
+                    if (item.snippet.toLowerCase().includes(term)) score += 2;
+                });
+                if (score > 0) localResults.push({ ...item, score });
+            });
+
+            try {
+                const wikiRes = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(query)}`);
+                const endTime = performance.now();
+                const duration = ((endTime - startTime) / 1000).toFixed(3);
+
+                if (wikiRes.ok) {
+                    const wikiData = await wikiRes.json();
+                    if (wikiData.type === 'standard' || wikiData.type === 'disambiguation') {
+                        let thumbnailHtml = wikiData.thumbnail ? `<img src="${wikiData.thumbnail.source}" class="ai-image" alt="${wikiData.title}">` : '';
+
+                        aiContainer.innerHTML = `
+                            <div class="ai-overview-card">
+                                <div class="ai-card-header">
+                                    <span><i class="fa-solid fa-brain"></i> NOZA AI Overview</span>
+                                    <span style="font-size: 11px; text-transform: none; opacity: 0.8;">Instant Synthesized Result</span>
+                                </div>
+                                <div class="ai-card-body">
+                                    ${thumbnailHtml}
+                                    <p id="ai-main-text"><strong>${wikiData.title}</strong> — ${wikiData.extract}</p>
+                                </div>
+                                <div class="ai-chat-input-box">
+                                    <input type="text" id="ai-followup-input" placeholder="Ask follow-up question to AI...">
+                                    <button onclick="askAIFollowup()">Ask AI</button>
+                                </div>
+                            </div>
+                        `;
+                    } else { aiContainer.innerHTML = ''; }
+                } else { aiContainer.innerHTML = ''; }
+
+                renderWebResults(localResults, query, terms, duration);
+
+            } catch (error) {
+                aiContainer.innerHTML = '';
+                const endTime = performance.now();
+                const duration = ((endTime - startTime) / 1000).toFixed(3);
+                renderWebResults(localResults, query, terms, duration);
+            }
+        }
+
+        function askAIFollowup() {
+            const input = document.getElementById('ai-followup-input');
+            const mainText = document.getElementById('ai-main-text');
+            if (!input.value) return;
+
+            mainText.innerHTML += `<br><br><strong style="color: var(--accent-cyan);">Q: ${escapeHtml(input.value)}</strong><br><em>AI Answer:</em> Detailed insights regarding ${escapeHtml(input.value)} are calculated based on latest indexed parameters.`;
+            input.value = '';
+        }
+
+        function renderRelatedQuestions(query) {
+            const container = document.getElementById('related-questions');
+            container.innerHTML = `
+                <div class="related-item" onclick="quickSearch('What is ${query}?')">What is ${query}?</div>
+                <div class="related-item" onclick="quickSearch('How does ${query} work?')">How does ${query} work?</div>
+                <div class="related-item" onclick="quickSearch('Best practices for ${query}')">Best practices for ${query}</div>
+                <div class="related-item" onclick="quickSearch('${query} comparison')">Top alternatives to ${query}</div>
+            `;
+        }
+
+        function renderWebResults(localResults, query, terms, timeSpent) {
+            const listContainer = document.getElementById('results-list');
+            const stats = document.getElementById('stats');
+
+            let allResults = [...localResults];
+            allResults.push({
+                title: `${query.charAt(0).toUpperCase() + query.slice(1)} - Wikipedia Encyclopedia`,
+                url: `https://en.wikipedia.org/wiki/${encodeURIComponent(query)}`,
+                snippet: `Read full encyclopedia facts, history, specifications, and deep insights about ${query}.`
+            });
+
+            allResults.push({
+                title: `Explore Web Results for "${query}" on DuckDuckGo`,
+                url: `https://duckduckgo.com/?q=${encodeURIComponent(query)}`,
+                snippet: `Access real-time global web links, news, and search updates regarding ${query}.`
+            });
+
+            stats.innerHTML = `About ${allResults.length} web result(s) found (${timeSpent} seconds) for "<strong>${escapeHtml(query)}</strong>"`;
+            listContainer.innerHTML = '';
+
+            allResults.forEach(item => {
+                listContainer.innerHTML += `
+                    <div class="result-card">
+                        <span class="result-url">${item.url}</span>
+                        <a href="${item.url}" target="_blank" class="result-title">${item.title}</a>
+                        <p class="result-snippet">${item.snippet}</p>
+                        <div class="result-card-actions">
+                            <button class="action-link" onclick="copyLink('${item.url}')"><i class="fa-solid fa-copy"></i> Copy Link</button>
+                            <button class="action-link" onclick="bookmarkResult(this)"><i class="fa-regular fa-bookmark"></i> Save</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // 2. IMAGES SEARCH
+        function executeImagesSearch(query) {
+            document.getElementById('ai-overview-container').innerHTML = '';
+            const listContainer = document.getElementById('results-list');
+            const stats = document.getElementById('stats');
+
+            stats.innerHTML = `Showing high-definition images for "<strong>${escapeHtml(query)}</strong>"`;
+            listContainer.innerHTML = `<div class="image-grid" id="image-grid-box"></div>`;
+
+            const grid = document.getElementById('image-grid-box');
+            for (let i = 1; i <= 8; i++) {
+                const imageUrl = `https://picsum.photos/400/300?random=${i + 20}`;
+                grid.innerHTML += `
+                    <a href="${imageUrl}" target="_blank" class="image-card" style="text-decoration:none;">
+                        <img src="${imageUrl}" alt="${query}">
+                        <div class="image-card-caption">${query} — Photo ${i}</div>
+                    </a>
+                `;
+            }
+        }
+
+        // 3. VIDEOS SEARCH
+        function executeVideosSearch(query) {
+            document.getElementById('ai-overview-container').innerHTML = '';
+            const listContainer = document.getElementById('results-list');
+            const stats = document.getElementById('stats');
+
+            stats.innerHTML = `Showing video results for "<strong>${escapeHtml(query)}</strong>"`;
+            listContainer.innerHTML = '';
+
+            const videoTitles = [
+                `Understanding ${query}: Ultimate Overview & Complete Guide`,
+                `${query} Explained in 10 Minutes - What You Need to Know`,
+                `Top 10 Things You Didn't Know About ${query}`,
+                `Deep Dive: The Future and Impact of ${query}`
+            ];
+
+            videoTitles.forEach((title, index) => {
+                const ytSearchUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
+                const thumbUrl = `https://picsum.photos/400/225?random=${index + 10}`;
+
+                listContainer.innerHTML += `
+                    <div class="video-card">
+                        <div class="video-thumb">
+                            <img src="${thumbUrl}" alt="Video thumbnail">
+                            <div class="play-btn"><i class="fa-solid fa-play"></i></div>
+                        </div>
+                        <div>
+                            <span class="result-url">youtube.com</span>
+                            <a href="${ytSearchUrl}" target="_blank" class="result-title" style="font-size: 18px;">${title}</a>
+                            <p class="result-snippet">Watch top trending videos and comprehensive coverage about ${query} on YouTube.</p>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // 4. NEWS SEARCH
+        function executeNewsSearch(query) {
+            document.getElementById('ai-overview-container').innerHTML = '';
+            const listContainer = document.getElementById('results-list');
+            const stats = document.getElementById('stats');
+
+            stats.innerHTML = `Showing latest news articles for "<strong>${escapeHtml(query)}</strong>"`;
+            listContainer.innerHTML = '';
+
+            const newsItems = [
+                { headline: `Breaking: Major Developments Reported in ${query}`, source: "Global News Network", time: "2 hours ago" },
+                { headline: `Industry Leaders Discuss the Future of ${query}`, source: "Tech Insights Daily", time: "5 hours ago" },
+                { headline: `New Research Highlights Key Trends in ${query}`, source: "Science & Business Review", time: "1 day ago" }
+            ];
+
+            newsItems.forEach(item => {
+                listContainer.innerHTML += `
+                    <div class="result-card">
+                        <span class="result-url">${item.source} • ${item.time}</span>
+                        <a href="https://news.google.com/search?q=${encodeURIComponent(query)}" target="_blank" class="result-title">${item.headline}</a>
+                        <p class="result-snippet">Read full coverage and live updates regarding ${query} from certified journalistic publishers.</p>
+                    </div>
+                `;
+            });
+        }
+
+        function copyLink(url) {
+            navigator.clipboard.writeText(url);
+            alert("Link copied to clipboard!");
+        }
+
+        function bookmarkResult(btn) {
+            btn.innerHTML = `<i class="fa-solid fa-bookmark" style="color:#a78bfa;"></i> Saved`;
+        }
+
+        function escapeHtml(string) {
+            return string.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+    </script>
+</body>
+</html>
